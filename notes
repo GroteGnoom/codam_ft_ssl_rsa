@@ -1,0 +1,15 @@
+https://en.wikipedia.org/wiki/Miller%E2%80%93Rabin_primality_test
+deterministic test:
+
+if n < 18,446,744,073,709,551,616 = 2^64, it is enough to test a = 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, and 37.
+
+is that not fast enough?
+
+or is it not allowed to assume the generalized Riemann hypothesis?
+
+no, must be correct for all those numbers
+
+interesting info on expected number of tests to find a prime
+https://imada.sdu.dk/u/joan/projects/RSA.pdf
+
+Usually you'd just use bigger numbers than 64-bits.
