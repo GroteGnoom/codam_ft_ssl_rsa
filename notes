@@ -13,3 +13,36 @@ interesting info on expected number of tests to find a prime
 https://imada.sdu.dk/u/joan/projects/RSA.pdf
 
 Usually you'd just use bigger numbers than 64-bits.
+
+
+-o is probably the filename to output to
+-i is the input fule in ft_ssl_des. But that's weird here, right? Because you don't have any input?
+
+openssl genrsa --verbose looks a little bit more like the expected output:
+
+openssl genrsa --verbose --numbits 512
+Generating RSA key with 512 bits
+..++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+..................++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+e is 65537 (0x010001)
+-----BEGIN PRIVATE KEY-----
+MIIBVQIBADANBgkqhkiG9w0BAQEFAASCAT8wggE7AgEAAkEA0pXtZMHftquAjxIt
++7B9ek29H3M7UltnQH3FAk0vMVgqvuwKmvjHZM5yR1YMppJCsq4E0/0tXo7M8WmL
+ooNKdwIDAQABAkBv5PhSDG4ZuwFBhFBopzvVK89tEaaYuTag3vM6qNaFqbLvd9eH
+WvsVZykEZSQN3SGg61Nzy52JX1d6Jr9/MR85AiEA+1SLr7pm7x2SDcmXqPv7ARgH
+feAxqKgoL8XJ5P75bRUCIQDWf5Rjf8EpuOjn/1dr4qEy/TCZf8nVHZRbGWPuI7x0
+WwIgU8U2WfgzXvfoOpg66KQ0YYT02kvjwWdrHaE7Tgx+bpECIQDFFUQKh/+7jiKx
+x3NTtU/Xwbs9zqRsJFmDuriOvlcRsQIhAPNCIKst1GZfPOi5LMv4hRRoCPRBWoid
+jHQbmNn/y7X7
+-----END PRIVATE KEY-----
+
+kid-RSA to help understand it?
+https://macs4200.org/chapters/11/1/kidrsa.html
+
+for a modulus of 64 bits we only need to be able to generate primes of 32 bits? it seems like V 0.1 lets you do too much work.
+
+In the original RSA paper,[1] the Euler totient function φ(n) = (p − 1)(q − 1) is used instead of λ(n) for calculating the private exponent d. Since φ(n) is always divisible by λ(n), the algorithm works as well. The possibility of using Euler totient function results also from Lagrange's theorem applied to the multiplicative group of integers modulo pq. Thus any d satisfying d⋅e ≡ 1 (mod φ(n)) also satisfies d⋅e ≡ 1 (mod λ(n)). However, computing d modulo φ(n) will sometimes yield a result that is larger than necessary (i.e. d > λ(n)).
+
+https://en.wikipedia.org/wiki/Multiplicative_group_of_integers_modulo_n
+
+https://www.khanacademy.org/computing/computer-science/cryptography/modarithmetic/a/fast-modular-exponentiation

@@ -1,0 +1,13 @@
+understand everything
+
+don't use time
+don't use rand
+check out urandom
+
+https://en.wikipedia.org/wiki/RSA_(cryptosystem) list of 5 steps
+step 1: 2 prime numbers p and q (with lots of demands)
+step 2: n = p*q
+step 3: Carmichael's totient (λ) of n = lcm(p - 1, q - 1).. but you can also use Euler's totient instead!
+step 4: e, which is coprime with λ, usually 65537. which is just prime. largest Fermat number, called F4. So not really a step, it's just 65537
+step 5: d = e^-1 (mod λ), so the modular multiplicative inverse of e , so de = 1 (mod λ)
+
