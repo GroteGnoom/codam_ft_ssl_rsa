@@ -46,3 +46,5 @@ In the original RSA paper,[1] the Euler totient function φ(n) = (p − 1)(q −
 https://en.wikipedia.org/wiki/Multiplicative_group_of_integers_modulo_n
 
 https://www.khanacademy.org/computing/computer-science/cryptography/modarithmetic/a/fast-modular-exponentiation
+
+https://brilliant.org/wiki/rsa-encryption/
