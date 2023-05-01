@@ -13,6 +13,20 @@ uint64_t mod_pow(uint64_t b, uint64_t e, uint64_t m) {
 	//apparently from bruce schneier
 	//https://en.wikipedia.org/wiki/Modular_exponentiation
 	//https://www.khanacademy.org/computing/computer-science/cryptography/modarithmetic/a/fast-modular-exponentiation
+	//So suppose the base is 7, the mod is 13
+	//if e is 1, then you multiply res(1) by base(7), and do mod(13), so you get 7, then 
+	//e becomes 0, the base becomes 7*7 mod 13 = 10, but that doesn't matter, because the loop
+	//stops there, end you just end up with a res of 7
+	//if e  is 2, then you shift it right, and set the b to 10
+	//then you go through the loop again and multiply res with the base to get 10.
+	//if e is 3, then you multiply res by 7, then on the next step you multiply it by 10
+	//
+	//it's just an exponentiation loop with mulmod instead of multiply
+	//
+	//and the exponentiation loop just keeps track of the exponent by squaring the base and shifting e to the right, 
+	//and then if you see a 1, then res gets multiplied by the correct exponent
+	//
+	//or another way to look at it: check first that it's correct for a 1 with some number of zero's behind it, like exp = 2^256. And then see that it's correct if there are multiple 1's in there, because it just multiplies then correct factors.
 	if (m == 1) return 0;
 	//assert?
 	uint64_t res = 1;
@@ -29,12 +43,26 @@ uint64_t mod_pow(uint64_t b, uint64_t e, uint64_t m) {
 
 uint64_t mulmod(uint64_t a, uint64_t b, uint64_t m) {
 	//https://stackoverflow.com/a/18680280
+	//
+	//this is just basic multiplication saying that 57 * 49 = (5 * 10 + 7) * 49 = 7 * 49 + 5 * 10 * 49, but then using binary
+	//so 101 * 11 = (1 * 2 * 2 + 1) * 11 = 1 * 11 + 0 * 2 * 11 + 1 * 2 * 2 * 11
+	//you just double the b (11) every time you shift a(101) right, and then add the b if you see 1 in a.
+	//
+	//the nice thing here is that doubling is just addition and there's a way to check if you're going to overflow by 
+	//first underflowing and then going back......
+	//wait, but doesn't the reverse also work? first overflowing and then going back? The problem there
+	//is that after the overflow you don't know what's going on anymore and the 'if' doesn't work. 
     uint64_t res = 0;
     uint64_t temp_b;
 
-    /* Only needed if b may be >= m */
+	/* we could say that this just never happens, but we might re-use this function
+	* in other places, which would mess everything up.
+	*/
     if (b >= m) {
         if (m > UINT64_MAX / 2u)
+		//in this case you know m is not multiple times in b, because if it was, b would be larger
+		// than the uint64 max, which is impossible. So since m is in b only once, you can just do subtraction
+		// instead of mod, which should be cheaper. 
             b -= m;
         else
             b %= m;
@@ -45,6 +73,10 @@ uint64_t mulmod(uint64_t a, uint64_t b, uint64_t m) {
             /* Add b to res, modulo m, without overflow */
             if (b >= m - res) /* Equiv to if (res + b >= m), without overflow */
                 res -= m;
+				/* of course, this can go below zero (for example for res == 0)
+				* but that's allowed, not undefined behavour. Then end result will always
+				* end up as a proper positibe number, because you do res - m + b
+				* and res + b >= m*/
             res += b;
         }
         a >>= 1;

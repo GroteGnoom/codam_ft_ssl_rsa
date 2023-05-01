@@ -9,3 +9,7 @@ test_miller:
 	clang -DRSA_TEST -O3 -flto -Wall -Werror -Wextra miller.c -lm -o miller
 	./miller
 
+test_der:
+	gcc -g -fsanitize=address -DDER_TEST -Wall -Wextra der.c -o der
+	./der
+

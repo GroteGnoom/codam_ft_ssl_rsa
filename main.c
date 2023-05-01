@@ -64,6 +64,19 @@ uint64_t mod_inverse(uint64_t a, uint64_t m) {
     return x1;
 }
 
+const char base64_table[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
+char* encode_base64(uint64_t num) {
+    char* output = (char*)malloc(11 * sizeof(char));
+    int i, j;
+    for (i = 0, j = 58; i < 10; i++, j -= 6) {
+        output[i] = base64_table[(num >> j) & 0x3f];
+    }
+    output[10] = '\0';
+    return output;
+}
+
+
 void generate_and_output_key(FILE *output) {
     srand(time(NULL));
     uint64_t p = generate_random_prime(1ULL << 31, (1ULL << 32) - 1);
@@ -89,6 +102,10 @@ void generate_and_output_key(FILE *output) {
     fprintf(output, "d: %lu\n", d);
     fprintf(output, "phi: %lu\n", phi);
     fprintf(output, "Carmichael's totient: %lu\n", carm_tot);
+    fprintf(output, "phi / ct: %lu\n", phi / carm_tot);
+    char *enc = encode_base64(n);
+    fprintf(output, "n, 64-bit encoded: %s\n", enc);
+    free(enc);
 }
 
 int main(int argc, char *argv[]) {

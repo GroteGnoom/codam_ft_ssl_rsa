@@ -47,4 +47,75 @@ https://en.wikipedia.org/wiki/Multiplicative_group_of_integers_modulo_n
 
 https://www.khanacademy.org/computing/computer-science/cryptography/modarithmetic/a/fast-modular-exponentiation
 
+<<<<<<< HEAD
 https://brilliant.org/wiki/rsa-encryption/
+=======
+so in the man page it says
+       -traditional
+           Write the key using the traditional PKCS#1 format instead of the
+           PKCS#8 format.
+
+so the default is PKCS#8 :D
+https://datatracker.ietf.org/doc/html/rfc5208
+https://www.itu.int/rec/T-REC-X.690
+
+but this says that 
+https://stackoverflow.com/questions/55675963/converting-a-string-private-key-to-privatekey-type
+BEGIN RSA PRIVATE KEY means your key is pkcs#1 format and not pkcs#8
+
+aha! else it says BEGIN PRIVATE KEY
+
+so if I want to do what the subject says, I need PKCS#1
+
+address sanitizer does give me linenumbers with gcc, but not with clang
+
+DER is like BER, but ber is general (so either CER or DER), CER does not use lengths, DER does explicitly put in the lengths
+
+for PKCS #1:
+https://www.rfc-editor.org/rfc/pdfrfc/rfc8017.txt.pdf
+
+PKCS #8 is very short?
+https://www.rfc-editor.org/rfc/pdfrfc/rfc5208.txt.pdf
+
+some nice explanations:
+https://stackoverflow.com/questions/48958304/pkcs1-and-pkcs8-format-for-rsa-private-key
+
+from pkcs:
+A recommended syntax for interchanging RSA private keys between
+implementations, which includes components from both representations,
+is given in Appendix A.1.2; an implementation’s internal
+representation may differ.
+Oh come on! It's so weird: here's the way to do it, but actually in practice do this other thing.
+An RSA private key should be represented with the ASN.1 type
+RSAPrivateKey:
+RSAPrivateKey ::= SEQUENCE {
+version Version,
+modulus INTEGER, -- n
+publicExponent INTEGER, -- e
+privateExponent INTEGER, -- d
+prime1 INTEGER, -- p
+prime2 INTEGER, -- q
+exponent1 INTEGER, -- d mod (p-1)
+exponent2 INTEGER, -- d mod (q-1)
+coefficient INTEGER, -- (inverse of q) mod p
+otherPrimeInfos OtherPrimeInfos OPTIONAL
+}
+
+version is the version number, for compatibility with future
+revisions of this document. It SHALL be 0 for this version of the
+document, unless multi-prime is used; in which case, it SHALL be
+1.
+Version ::= INTEGER { two-prime(0), multi(1) }
+(CONSTRAINED BY
+{-- version must be multi if otherPrimeInfos present --})
+
+so the version is just the INTEGER 0
+
+I can't find the INTEGER tag number in the X.690, but everybody says it's 2:
+https://stackoverflow.com/questions/55357924/asn-1-der-encoding-of-integers
+https://letsencrypt.org/docs/a-warm-welcome-to-asn1-and-der/
+https://letsencrypt.org/docs/a-warm-welcome-to-asn1-and-der/#tag
+, maybe it's in x.680 or something. Yes
+X.6801, 8.6 page 26
+UNIVERSAL 2 Integer type
+
