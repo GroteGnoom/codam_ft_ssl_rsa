@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include "ft_ssl_rsa.h"
 
 // Function to write an ASN.1 length
 void der_write_length(FILE *output, size_t length) {
@@ -170,7 +171,12 @@ unsigned char* read_file_to_string(FILE *fp) {
 
     // determine file size
     fseek(fp, 0, SEEK_END);
-    long size = ftell(fp);
+    long lsize = ftell(fp);
+    if (lsize < 0) {
+        printf("ftell failed");
+        exit(1);
+    } 
+    uint64_t size = (uint64_t) lsize;
     fseek(fp, 0, SEEK_SET);
 
     // allocate buffer to hold file contents
@@ -195,18 +201,16 @@ unsigned char* read_file_to_string(FILE *fp) {
     return buffer;
 }
 
-void generate_and_output_key_pkcs1(FILE *output) {
+void generate_and_output_key_pkcs1(FILE *output, uint64_t e, uint64_t d, uint64_t p, uint64_t q) {
     // Generate the RSA parameters
-    uint64_t n = 123; // Replace with your actual value
-    uint64_t e = 65537; // Replace with your actual value
-    uint64_t d = 456; // Replace with your actual value
-    uint64_t p = 789; // Replace with your actual value
-    uint64_t q = 101112; // Replace with your actual value
-    uint64_t dp = d % (p - 1); // Replace with your actual value
-    uint64_t dq = d % (q - 1); // Replace with your actual value
-    uint64_t qi = q; // Replace with your actual value, this is (inverse of q) mod p
+    uint64_t n = p * q;
+    uint64_t dp = d % (p - 1);
+    uint64_t dq = d % (q - 1);
+    uint64_t qi = mod_inverse(q, p);
 
     // Write the RSAPrivateKey
+    // TODO using a file instead of a buffer 
+    // seems like the wrong way to do this
     FILE *rsa_private_key = tmpfile();
     der_write_integer(rsa_private_key, 0); // version
     der_write_integer(rsa_private_key, n);
@@ -228,12 +232,13 @@ void generate_and_output_key_pkcs1(FILE *output) {
     //free(tmp);
 
     // Close the temporary file
+    // This causes a double free?
     //fclose(rsa_private_key);
 }
 
 #ifdef DER_TEST
 int main() {
-    generate_and_output_key_pkcs1(stdout);
+    generate_and_output_key_pkcs1(stdout, 65537, 456, 789, 101112);
 }
 #endif
 
